@@ -1,0 +1,18 @@
+.error {
+	color: #FF0000;
+}
+
+body {
+	font-size:90%; 
+	text-align: center; 
+	font-family: sans-serif; 
+	line-height: 1.75;
+	background-color: #5F9EA0;
+}
+
+#page {
+	width: 804px; 
+	margin: 30px auto 10px auto; 
+	text-align: left;
+}
+   
