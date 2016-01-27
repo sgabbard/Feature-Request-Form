@@ -44,28 +44,19 @@
 		 }
 	   }
 		
-		
-		$date = new DateTime();
 		if (empty($_POST["targetDate"])) {
 		 $targetDateErr = "Target date is required";
 	   } else {
 		 $targetDate = test_input($_POST["targetDate"]);
-		 // check if date is in correct format
-		 if (!preg_match("/^[ _]*[A-Z0-9][A-Z0-9 _]*$/",$targetDate)) {
-		   $targetDateErr = "Target date must be in mm/dd/yyyy format"; 
-		 }
-		 if ($targetDate != "mm/dd/yy" || $targetDate < $date){
-			 $targetDateErr = "Past dates not allowed";
-		 }
 	   }
 	   
 	   if (empty($_POST["ticketURL"])) {
-		 $ticketURL = "Ticket URL required";
+		 $ticketUrlErr = "Ticket URL required";
 	   } else {
 		 $ticketURL = test_input($_POST["ticketURL"]);
 		 // check if URL address syntax is valid 
-		 if (!preg_match("/\b(?:(?:https?|ftp):\/\/|www\.)[-a-z0-9+&@#\/%?=~_|!:,.;]*[-a-z0-9+&@#\/%=~_|]/i",$website)) {
-		   $ticketURLErr = "Invalid URL"; 
+		 if (!preg_match("/\b(?:(?:https?|ftp):\/\/|www\.)[-a-z0-9+&@#\/%?=~_|!:,.;]*[-a-z0-9+&@#\/%=~_|]/i",$ticketURL)) {
+		   $ticketUrlErr = "Invalid URL"; 
 		 }
 	   }
 	}
@@ -116,7 +107,7 @@
 				   <tr>
 					   <td>Target Date: </td>
 					   <td>
-					   <input type="date" name="targetDate" class="label"/>
+					   <input type="date" name="targetDate" class="label" value="<?php echo date('Y-m-d'); ?>"/>
 					   <span class="error">* <?php echo $targetDateErr;?></span>
 					   </td>
 				   </tr>
