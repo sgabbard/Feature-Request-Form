@@ -10,9 +10,13 @@
 <?php
 	// define variables and set to empty values
 	$titleErr = $descErr = $priorityErr = $targetDateErr = $ticketUrlErr = "";
-	$title = $desc = $priority = $targetDate = $ticketURL = "";
+	$title = $desc = $client = $priority = $targetDate = $ticketURL = $client = "";
 
 	if ($_SERVER["REQUEST_METHOD"] == "POST") {
+		
+		$client = $_POST("client");
+		$product = $_POST("product");
+		
 	   if (empty($_POST["title"])) {
 		 $titleErr = "Title is required";
 	   } else {
@@ -67,11 +71,67 @@
 	   $data = htmlspecialchars($data);
 	   return $data;
 	}
+	
+	function insertFeatureRequest() {
+		$host="localhost";
+		$port=3306;
+		$socket="";
+		$user="root";
+		$password="Password1!";
+		$dbname="featureRequest";
+		
+		$dbConn = new mysqli($host, $user, $password, $dbname, $port, $socket)
+			or die ('Could not connect to the database server' . mysqli_connect_error());
+		
+		//get the records that have equal or greater priority
+		$query = "SELECT `feature_request`.`title`, `feature_request`.`description`, `feature_request`.`client`, `feature_request`.`priority`, `feature_request`.`target_date`, `feature_request`.`ticket_URL`, `feature_request`.`product` FROM `feature_request_schema`.`feature_request` WHERE `feature_request`.`priority` >= " .$priority;
+		
+		$result = mysqli_query($dbConn, $query);
+
+		if (!$result) {
+			print "Error - the query could not be executed" . mysqli_error($dbConn);
+			exit;
+		}
+		
+		//loop through the results and increment the priorities by 1
+		while ($row = mysqli_fetch_array($result, MYSQL_NUM)) {
+			$reqTitle = $row[0];
+			$recPriority = $row[4];
+			$sql = "UPDATE `feature_request`.`title` SET `feature_request`.`priority`=" .$recPriority + 1. "' WHERE `feature_request`.`title`= " .$reqTitle. ";"
+
+			if ($dbConn->query($sql) !== TRUE) {
+				echo "Error updating record: " . $dbConn->error;
+			}
+		}
+			
+		//insert the new  record
+		$sql = "INSERT INTO `feature_request_schema`.`feature_request` (`feature_request`.`title`, `feature_request`.`description`, `feature_request`.`client`, `feature_request`.`priority`, `feature_request`.`target_date`, `feature_request`.`ticket_URL`, `feature_request`.`product`) VALUES ($title, $desc, $client, $priority, $targetDate, $ticketURL, $product)". ";"
+		if (!mysqli_query($conn, $sql)) {
+			echo "Error: " . $sql . "<br>" . mysqli_error($conn);
+		} 
+		
+		//close the connection
+		$dbConn->close();
+	}
+	
+	function validate_form() {
+		if ($titleErr == "" || $descErr == "" || $priorityErr == "" || $targetDateErr == "" || $ticketUrlErr == "") {
+			//submit to the database 
+			insertFeatureRequest($cat_id);
+			
+			//navigate to the success page
+			header("Location: /form_submit.php");
+			exit;
+		}
+		else {
+			echo htmlspecialchars($_SERVER["PHP_SELF"]);
+		}
+	}
 ?>		
 		<div id="page" class="layout">
 			<h2>Feature Request Form</h2>
 			<span class="error">* required field</span>
-			<form method="post" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]);?>">
+			<form method="post" action="<?php validate_form();?>">
 				<table>
 					<tr>
 					   <td>Title: </td>
